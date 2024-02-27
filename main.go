@@ -4,10 +4,18 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 func mirrorHandler(writer http.ResponseWriter, request *http.Request) {
 	request.Write(writer)
+}
+
+func cookieHandler(writer http.ResponseWriter, request *http.Request) {
+	cookie := &http.Cookie{}
+	cookie.Name = "test"
+	cookie.Value = time.Now().Format(time.RFC3339)
+	http.SetCookie(writer, cookie)
 }
 
 func main() {
@@ -19,6 +27,7 @@ func main() {
 
 	log.Println("Listening on :" + port)
 	http.HandleFunc("/", mirrorHandler)
+	http.HandleFunc("/cookie", cookieHandler)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatal(err)
